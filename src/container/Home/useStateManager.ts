@@ -11,5 +11,8 @@ export const useStateManager = () => {
   // Landmark page state
   const [landmarkForm, setLandmarkForm] = React.useState<any>({ x: null, y: null, type: null });
 
-  return { landmarkForm, setLandmarkForm, tab, setTab, itemsToFind, setItemsToFind };
+  // Right panel state
+  const [currentCoordinate, setCurrentCoordinate] = React.useState([0, 0]);
+
+  return { landmarkForm, setLandmarkForm, tab, setTab, itemsToFind, setItemsToFind, currentCoordinate, setCurrentCoordinate };
 };

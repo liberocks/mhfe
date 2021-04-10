@@ -17,7 +17,7 @@ export const Outbound: React.FC<any> = ({ stateManager }) => {
             <TextField
               value={item}
               label="Item"
-              placeholder="Name/SKU Code"
+              placeholder="Name or SKU Code"
               margin="normal"
               fullWidth
               InputLabelProps={{
