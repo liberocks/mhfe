@@ -15,10 +15,13 @@ import { Landmark } from './Landmark';
 import { Outbound } from './Outbound';
 
 export const LeftPanel: React.FC<any> = ({ stateManager }) => {
-  const { tab, setTab, loading } = stateManager;
+  const { tab, setTab, loading, setBestRoute } = stateManager;
 
   const handleChange = (event: any, newValue: any) => {
-    if (!loading) setTab(newValue);
+    if (!loading) {
+      setTab(newValue);
+      setBestRoute([]);
+    }
   };
 
   return (

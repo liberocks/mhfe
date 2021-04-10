@@ -5,10 +5,12 @@ import React from 'react';
 
 import { Grid, TextField, Button, Typography } from '@material-ui/core';
 
+import { ShowIf } from '../../components';
+
 import { postRoute } from './api';
 
 export const Outbound: React.FC<any> = ({ stateManager }) => {
-  const { itemsToFind, setItemsToFind, setBestRoute, setNewPackets } = stateManager;
+  const { itemsToFind, bestRoute, setItemsToFind, setBestRoute, setNewPackets } = stateManager;
   const [localLoading, setLocalLoading] = React.useState(false);
   const [localLoadingMessage, setLocalLoadingMessage] = React.useState<string | null>('');
 
@@ -90,6 +92,29 @@ export const Outbound: React.FC<any> = ({ stateManager }) => {
           </Button>
         </Grid>
       </Grid>
+
+      <ShowIf cond={!!bestRoute && bestRoute.points}>
+        <div style={{ marginLeft: 10 }}>
+          <Typography style={{ fontSize: 18, fontWeight: 'bold', marginTop: 30 }}>Best Route</Typography>
+          {bestRoute &&
+            bestRoute.points &&
+            bestRoute.points.map((point: any, index: number) => {
+              return (
+                <>
+                  <Typography style={{ fontSize: 16, marginTop: 10 }}>
+                    {index + 1}. Rack on coordinate ({point.x},{point.y})
+                  </Typography>
+                  <ShowIf cond={index !== bestRoute.points.length - 1}>
+                    <Typography style={{ fontSize: 12, marginTop: 5, marginLeft: 20 }}>
+                      point {index + 1} {'->'} point {index + 2} is spanned along {bestRoute.distances[index]} meter(s){' '}
+                    </Typography>
+                  </ShowIf>
+                </>
+              );
+            })}
+          <Typography style={{ fontSize: 16, marginTop: 10 }}>Total distance {bestRoute && bestRoute.totalDistance} meter(s)</Typography>
+        </div>
+      </ShowIf>
     </>
   );
 };

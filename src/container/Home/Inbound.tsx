@@ -95,12 +95,13 @@ export const Inbound: React.FC<any> = ({ stateManager }) => {
           </Button>
         </Grid>
 
-        <ShowIf cond={!!bestRoute}>
+        <ShowIf cond={!!bestRoute && bestRoute.points}>
           <Typography style={{ fontSize: 18, fontWeight: 'bold', marginTop: 30 }}>Best Route</Typography>
           {bestRoute &&
+            bestRoute.points &&
             bestRoute.points.map((point: any, index: number) => {
               let item = newPackets && newPackets.filter((packet: any) => packet.x === point.x && packet.y === point.y);
-              if (item.length > 0) item = item[0];
+              if (item && item.length > 0) item = item[0];
 
               return (
                 <>

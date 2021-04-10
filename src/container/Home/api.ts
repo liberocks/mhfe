@@ -4,8 +4,7 @@ import axios from 'axios';
 
 import { MAX_X, MAX_Y } from '../../constant';
 
-// const API_BASE_URL = 'http://ec2-3-238-181-74.compute-1.amazonaws.com:8000';
-const API_BASE_URL = 'http://0.0.0.0:8000';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 export const ruok = () => {
   return axios.get(`${API_BASE_URL}/ruok`);
@@ -32,5 +31,11 @@ export const postPacket = (stock: any, name: any, SKUCode: any) => {
 };
 
 export const postRoute = (packet_ids: string[]) => {
-  return axios.post(`${API_BASE_URL}/route`, { packet_ids, maximum_x: MAX_X, maximum_y: MAX_Y, shape_x: MAX_X, shape_y: MAX_Y });
+  return axios.post(`${API_BASE_URL}/route`, {
+    packet_ids: packet_ids.filter((packet_id) => packet_id),
+    maximum_x: MAX_X,
+    maximum_y: MAX_Y,
+    shape_x: MAX_X,
+    shape_y: MAX_Y,
+  });
 };

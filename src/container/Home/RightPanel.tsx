@@ -62,7 +62,7 @@ export const RightPanel: React.FC<any> = ({ stateManager }) => {
 
         p5.rect(x * dim, y * dim, dim, dim);
 
-        if (bestRoute && bestRoute.route.length >= 4) {
+        if (bestRoute && bestRoute.route && bestRoute.route.length >= 4) {
           const { route } = bestRoute;
 
           for (let i = 0; i < -2 + bestRoute.route.length; i += 2) {
@@ -103,10 +103,8 @@ export const RightPanel: React.FC<any> = ({ stateManager }) => {
       setLoading(true);
       setLoadingMessage('Fetching landmark...');
 
-      const {
-        data: { clickedLandmark },
-      } = await getLandmark(x, y);
-      setLandmarkOnClickedCoordinate(clickedLandmark);
+      const clickedLandmark = await getLandmark(x, y);
+      setLandmarkOnClickedCoordinate(clickedLandmark.data);
 
       const {
         data: { docs: packets },
@@ -132,19 +130,21 @@ export const RightPanel: React.FC<any> = ({ stateManager }) => {
         Coordinate ({currentCoordinate[0]},{currentCoordinate[1]})
       </Typography>
       <Typography style={{ bottom: 10, right: 20, position: 'absolute', fontSize: 18, fontWeight: 'bold' }}>Maphouse</Typography>
+
       <Snackbar
         anchorOrigin={{
           vertical: 'bottom',
           horizontal: 'left',
         }}
         open={itemOnClickedCoordinate && itemOnClickedCoordinate.length > 0}
-        autoHideDuration={6000}
+        autoHideDuration={15000}
         onClose={() => {
+          setLandmarkOnClickedCoordinate(null);
           setItemOnClickedCoordinate([]);
         }}
         message={[
           landmarkOnClickedCoordinate && (
-            <Typography style={{ marginTop: 5 }}>Available rack capacity {landmarkOnClickedCoordinate.capacity} item(s)</Typography>
+            <Typography style={{ marginTop: 5 }}>Available rack capacity {landmarkOnClickedCoordinate?.capacity} item(s)</Typography>
           ),
           ...(itemOnClickedCoordinate as Record<string, any>[]).map((item) => {
             return (
@@ -161,6 +161,7 @@ export const RightPanel: React.FC<any> = ({ stateManager }) => {
               aria-label="close"
               color="inherit"
               onClick={() => {
+                setLandmarkOnClickedCoordinate(null);
                 setItemOnClickedCoordinate([]);
               }}
             >
