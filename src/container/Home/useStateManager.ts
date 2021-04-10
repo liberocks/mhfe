@@ -11,6 +11,7 @@ export const useStateManager = () => {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [loadingMessage, setLoadingMessage] = React.useState<string | null>(null);
   const [itemOnClickedCoordinate, setItemOnClickedCoordinate] = React.useState<any[]>([]);
+  const [landmarkOnClickedCoordinate, setLandmarkOnClickedCoordinate] = React.useState<any>(null);
 
   // Outbound page state
   const [itemsToFind, setItemsToFind] = React.useState<any[]>(['']);
@@ -60,5 +61,7 @@ export const useStateManager = () => {
     setNewPackets,
     itemOnClickedCoordinate,
     setItemOnClickedCoordinate,
+    landmarkOnClickedCoordinate,
+    setLandmarkOnClickedCoordinate,
   };
 };

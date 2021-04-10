@@ -31,6 +31,8 @@ export const RightPanel: React.FC<any> = ({ stateManager }) => {
     alternativeRoutes,
     itemOnClickedCoordinate,
     setItemOnClickedCoordinate,
+    landmarkOnClickedCoordinate,
+    setLandmarkOnClickedCoordinate,
   } = stateManager;
 
   const setup = (p5: any, canvasParentRef: any) => {
@@ -100,6 +102,12 @@ export const RightPanel: React.FC<any> = ({ stateManager }) => {
     } else if (tab === 0 && x >= 0 && y >= 0 && !loading) {
       setLoading(true);
       setLoadingMessage('Fetching landmark...');
+
+      const {
+        data: { clickedLandmark },
+      } = await getLandmark(x, y);
+      setLandmarkOnClickedCoordinate(clickedLandmark);
+
       const {
         data: { docs: packets },
       } = await getPackets(x, y);
@@ -134,13 +142,18 @@ export const RightPanel: React.FC<any> = ({ stateManager }) => {
         onClose={() => {
           setItemOnClickedCoordinate([]);
         }}
-        message={(itemOnClickedCoordinate as Record<string, any>[]).map((item) => {
-          return (
-            <Typography style={{ marginTop: 5 }}>
-              [{item._id}] {item.name} ({item.SKUCode}) total {item.stock} stock(s)
-            </Typography>
-          );
-        })}
+        message={[
+          landmarkOnClickedCoordinate && (
+            <Typography style={{ marginTop: 5 }}>Available rack capacity {landmarkOnClickedCoordinate.capacity} item(s)</Typography>
+          ),
+          ...(itemOnClickedCoordinate as Record<string, any>[]).map((item) => {
+            return (
+              <Typography style={{ marginTop: 5 }}>
+                [{item._id}] {item.name} ({item.SKUCode}) total {item.stock} stock(s)
+              </Typography>
+            );
+          }),
+        ]}
         action={
           <React.Fragment>
             <IconButton

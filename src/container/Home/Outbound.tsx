@@ -8,7 +8,9 @@ import { Grid, TextField, Button, Typography } from '@material-ui/core';
 import { postRoute } from './api';
 
 export const Outbound: React.FC<any> = ({ stateManager }) => {
-  const { itemsToFind, setItemsToFind, loading, setLoading, setLoadingMessage, setBestRoute, setNewPackets } = stateManager;
+  const { itemsToFind, setItemsToFind, setBestRoute, setNewPackets } = stateManager;
+  const [localLoading, setLocalLoading] = React.useState(false);
+  const [localLoadingMessage, setLocalLoadingMessage] = React.useState<string | null>('');
 
   return (
     <>
@@ -67,24 +69,24 @@ export const Outbound: React.FC<any> = ({ stateManager }) => {
             variant="contained"
             color="primary"
             style={{ width: '100%', marginTop: 10 }}
-            disabled={loading}
+            disabled={localLoading}
             onClick={async () => {
               try {
-                setLoading(true);
-                setLoadingMessage('Finding best route...');
+                setLocalLoading(true);
+                setLocalLoadingMessage('Finding best route...');
                 const { data: allocation } = await postRoute(itemsToFind);
 
                 setBestRoute(allocation.best);
                 setNewPackets(allocation.newPackets);
-                setLoadingMessage(null);
-                setLoading(false);
+                setLocalLoadingMessage(null);
+                setLocalLoading(false);
               } catch (e) {
-                setLoading(false);
-                setLoadingMessage(null);
+                setLocalLoading(false);
+                setLocalLoadingMessage(null);
               }
             }}
           >
-            Find best route
+            {localLoading ? localLoadingMessage : 'Find best route'}
           </Button>
         </Grid>
       </Grid>
