@@ -13,6 +13,10 @@ export const getLandmark = (x: any, y: any) => {
   return axios.get(`${API_BASE_URL}/landmark/${x}/${y}`);
 };
 
+export const getLandmarks = () => {
+  return axios.get(`${API_BASE_URL}/landmarks`);
+};
+
 export const putLandmark = (x: any, y: any, type: null | string = 'wall', capacity = 0) => {
   return axios.put(`${API_BASE_URL}/landmark`, { x, y, type, capacity });
 };

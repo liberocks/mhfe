@@ -30,8 +30,10 @@ export const RightPanel: React.FC<any> = ({ stateManager }) => {
         p5.strokeWeight(1);
         p5.stroke(225);
 
-        if (!!landmarkState[x + y * MAX_X]) {
+        if (landmarkState[x + y * MAX_X] === 1) {
           p5.fill(0, 0, 0);
+        } else if (landmarkState[x + y * MAX_X] === 2) {
+          p5.fill(102, 102, 255);
         } else if (p5.mouseX > x * dim && p5.mouseX < (x + 1) * dim && p5.mouseY > y * dim && p5.mouseY < (y + 1) * dim) {
           setCurrentCoordinate([x, y]);
           p5.fill(225, 225, 225);
