@@ -10,6 +10,7 @@ export const useStateManager = () => {
   const [tab, setTab] = React.useState<any>(0);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [loadingMessage, setLoadingMessage] = React.useState<string | null>(null);
+  const [itemOnClickedCoordinate, setItemOnClickedCoordinate] = React.useState<any[]>([]);
 
   // Outbound page state
   const [itemsToFind, setItemsToFind] = React.useState<any[]>(['']);
@@ -24,6 +25,7 @@ export const useStateManager = () => {
   const [currentCoordinate, setCurrentCoordinate] = React.useState([0, 0]);
   const [alternativeRoutes, setAlternativeRoutes] = React.useState<any>([]);
   const [bestRoute, setBestRoute] = React.useState<any>(null);
+  const [newPackets, setNewPackets] = React.useState<any>([]);
 
   const landmarkGrid: any[] = [];
   for (let x = 0; x < MAX_X; x++) {
@@ -54,5 +56,9 @@ export const useStateManager = () => {
     setAlternativeRoutes,
     bestRoute,
     setBestRoute,
+    newPackets,
+    setNewPackets,
+    itemOnClickedCoordinate,
+    setItemOnClickedCoordinate,
   };
 };

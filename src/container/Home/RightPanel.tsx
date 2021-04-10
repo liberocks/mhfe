@@ -3,15 +3,16 @@
 
 import React from 'react';
 
-import { Typography, CircularProgress } from '@material-ui/core';
+import { Typography, CircularProgress, Snackbar, IconButton } from '@material-ui/core';
 
+import CloseIcon from '@material-ui/icons/Close';
 import _ from 'lodash';
 import Sketch from 'react-p5';
 
 import { ShowIf } from '../../components';
 import { MAX_X, MAX_Y } from '../../constant';
 
-import { getLandmark, putLandmark, ruok } from './api';
+import { getLandmark, getPackets, putLandmark } from './api';
 
 const dim = 20;
 
@@ -28,6 +29,8 @@ export const RightPanel: React.FC<any> = ({ stateManager }) => {
     setLandmarkState,
     bestRoute,
     alternativeRoutes,
+    itemOnClickedCoordinate,
+    setItemOnClickedCoordinate,
   } = stateManager;
 
   const setup = (p5: any, canvasParentRef: any) => {
@@ -94,6 +97,13 @@ export const RightPanel: React.FC<any> = ({ stateManager }) => {
         landmarkState[x + y * MAX_X] = 1;
       }
       setLandmarkState([...landmarkState]);
+    } else if (tab === 0 && x >= 0 && y >= 0 && !loading) {
+      setLoading(true);
+      setLoadingMessage('Fetching landmark...');
+      const {
+        data: { docs: packets },
+      } = await getPackets(x, y);
+      setItemOnClickedCoordinate(packets);
     }
 
     setLoadingMessage(null);
@@ -114,6 +124,38 @@ export const RightPanel: React.FC<any> = ({ stateManager }) => {
         Coordinate ({currentCoordinate[0]},{currentCoordinate[1]})
       </Typography>
       <Typography style={{ bottom: 10, right: 20, position: 'absolute', fontSize: 18, fontWeight: 'bold' }}>Maphouse</Typography>
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        open={itemOnClickedCoordinate && itemOnClickedCoordinate.length > 0}
+        autoHideDuration={6000}
+        onClose={() => {
+          setItemOnClickedCoordinate([]);
+        }}
+        message={(itemOnClickedCoordinate as Record<string, any>[]).map((item) => {
+          return (
+            <Typography style={{ marginTop: 5 }}>
+              [{item._id}] {item.name} ({item.SKUCode}) total {item.stock} stock(s)
+            </Typography>
+          );
+        })}
+        action={
+          <React.Fragment>
+            <IconButton
+              size="small"
+              aria-label="close"
+              color="inherit"
+              onClick={() => {
+                setItemOnClickedCoordinate([]);
+              }}
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </React.Fragment>
+        }
+      />
     </>
   );
 };

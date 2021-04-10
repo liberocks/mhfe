@@ -5,8 +5,10 @@ import React from 'react';
 
 import { Grid, TextField, Button, Typography } from '@material-ui/core';
 
+import { postRoute } from './api';
+
 export const Outbound: React.FC<any> = ({ stateManager }) => {
-  const { itemsToFind, setItemsToFind, loading } = stateManager;
+  const { itemsToFind, setItemsToFind, loading, setLoading, setLoadingMessage, setBestRoute, setNewPackets } = stateManager;
 
   return (
     <>
@@ -16,8 +18,12 @@ export const Outbound: React.FC<any> = ({ stateManager }) => {
           <Grid item>
             <TextField
               value={item}
-              label="Item"
-              placeholder="Name or SKU Code"
+              onChange={(e) => {
+                itemsToFind[index] = e.target.value;
+                setItemsToFind([...itemsToFind]);
+              }}
+              label="Item id"
+              placeholder="Item id"
               margin="normal"
               fullWidth
               InputLabelProps={{
@@ -57,7 +63,27 @@ export const Outbound: React.FC<any> = ({ stateManager }) => {
           </Grid>
         </Grid>
         <Grid item>
-          <Button variant="contained" color="primary" style={{ width: '100%', marginTop: 10 }} disabled={loading}>
+          <Button
+            variant="contained"
+            color="primary"
+            style={{ width: '100%', marginTop: 10 }}
+            disabled={loading}
+            onClick={async () => {
+              try {
+                setLoading(true);
+                setLoadingMessage('Finding best route...');
+                const { data: allocation } = await postRoute(itemsToFind);
+
+                setBestRoute(allocation.best);
+                setNewPackets(allocation.newPackets);
+                setLoadingMessage(null);
+                setLoading(false);
+              } catch (e) {
+                setLoading(false);
+                setLoadingMessage(null);
+              }
+            }}
+          >
             Find best route
           </Button>
         </Grid>

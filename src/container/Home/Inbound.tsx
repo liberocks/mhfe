@@ -10,7 +10,11 @@ import { ShowIf } from '../../components';
 import { postPacket } from './api';
 
 export const Inbound: React.FC<any> = ({ stateManager }) => {
-  const { inboundForm, setInboundForm, loading, setLoading, bestRoute, setAlternativeRoutes, setBestRoute, setLoadingMessage } = stateManager;
+  const { inboundForm, setInboundForm, bestRoute, newPackets, setNewPackets, setBestRoute } = stateManager;
+
+  const [localLoading, setLocalLoading] = React.useState(false);
+  const [localLoadingMessage, setLocalLoadingMessage] = React.useState<string | null>('');
+
   return (
     <>
       <Typography style={{ margin: 10, marginBottom: 0, fontWeight: 'bold' }}>New inbound item</Typography>
@@ -67,25 +71,27 @@ export const Inbound: React.FC<any> = ({ stateManager }) => {
             variant="contained"
             color="primary"
             style={{ width: '100%', marginTop: 20 }}
-            disabled={loading}
-            onClick={async () => {
-              try {
-                setLoading(true);
-                setLoadingMessage('Finding best rack to store...');
-                const res = await postPacket(inboundForm.stock, inboundForm.name, inboundForm.SKUCode);
-                const { data: allocation } = res;
+            disabled={localLoading}
+            onClick={() => {
+              setLocalLoading(true);
+              setLocalLoadingMessage('Finding best rack to store...');
+              postPacket(inboundForm.stock, inboundForm.name, inboundForm.SKUCode)
+                .then((res) => {
+                  const { data: allocation } = res;
 
-                setBestRoute(allocation.best);
-                setAlternativeRoutes(allocation.alternatives);
-              } catch (e) {
-                console.log(e.message);
-              } finally {
-                setLoadingMessage(null);
-                setLoading(false);
-              }
+                  setBestRoute(allocation.best);
+                  setNewPackets(allocation.newPackets);
+                  setLocalLoadingMessage(null);
+                  setLocalLoading(false);
+                })
+                .catch((e) => {
+                  console.log(e.message);
+                  setLocalLoadingMessage(null);
+                  setLocalLoading(false);
+                });
             }}
           >
-            Add
+            {localLoading ? 'Finding best racks to store' : 'Add'}
           </Button>
         </Grid>
 
@@ -93,21 +99,23 @@ export const Inbound: React.FC<any> = ({ stateManager }) => {
           <Typography style={{ fontSize: 18, fontWeight: 'bold', marginTop: 30 }}>Best Route</Typography>
           {bestRoute &&
             bestRoute.points.map((point: any, index: number) => {
+              let item = newPackets && newPackets.filter((packet: any) => packet.x === point.x && packet.y === point.y);
+              if (item.length > 0) item = item[0];
+
               return (
                 <>
                   <Typography style={{ fontSize: 16, marginTop: 10 }}>
-                    {index + 1}. Rack on coordinate ({point.x},{point.y}){' '}
-                    {bestRoute.newPackets.filter((packet: any) => packet.x === point.x && packet.y === point.y)[0].stock} item(s)
+                    {index + 1}. Rack on coordinate ({point.x},{point.y}){item && ` stores ${item.stock} item(s)`}
                   </Typography>
                   <ShowIf cond={index !== bestRoute.points.length - 1}>
-                    <Typography style={{ fontSize: 14, marginTop: 5, marginLeft: 20 }}>
-                      point {index + 1} {'->'} point {index + 2} {bestRoute.distances[index]} meter{' '}
+                    <Typography style={{ fontSize: 12, marginTop: 5, marginLeft: 20 }}>
+                      point {index + 1} {'->'} point {index + 2} is spanned along {bestRoute.distances[index]} meter(s){' '}
                     </Typography>
                   </ShowIf>
                 </>
               );
             })}
-          <Typography style={{ fontSize: 16, marginTop: 10 }}>Total distance {bestRoute && bestRoute.totalDistance} m</Typography>
+          <Typography style={{ fontSize: 16, marginTop: 10 }}>Total distance {bestRoute && bestRoute.totalDistance} meter(s)</Typography>
         </ShowIf>
       </Grid>
     </>
