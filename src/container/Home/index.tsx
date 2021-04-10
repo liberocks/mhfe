@@ -12,9 +12,10 @@ import { useStateManager } from './useStateManager';
 
 export const Home: React.FC = () => {
   const stateManager = useStateManager();
-  const { loading, setLoading, landmarkState, setLandmarkState } = stateManager;
+  const { setLoadingMessage, setLoading, landmarkState, setLandmarkState } = stateManager;
 
   React.useEffect(() => {
+    setLoadingMessage('Rendering floorplan...');
     setLoading(true);
     getLandmarks().then(({ data: landmarks }) => {
       for (const landmark of landmarks) {
@@ -25,6 +26,7 @@ export const Home: React.FC = () => {
         }
         setLandmarkState([...landmarkState]);
       }
+      setLoadingMessage(null);
       setLoading(false);
     });
   }, []);

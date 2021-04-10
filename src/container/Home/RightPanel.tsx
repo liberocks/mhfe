@@ -16,7 +16,19 @@ import { getLandmark, putLandmark, ruok } from './api';
 const dim = 20;
 
 export const RightPanel: React.FC<any> = ({ stateManager }) => {
-  const { currentCoordinate, setCurrentCoordinate, tab, loading, setLoading, landmarkState, setLandmarkState } = stateManager;
+  const {
+    loadingMessage,
+    setLoadingMessage,
+    currentCoordinate,
+    setCurrentCoordinate,
+    tab,
+    loading,
+    setLoading,
+    landmarkState,
+    setLandmarkState,
+    bestRoute,
+    alternativeRoutes,
+  } = stateManager;
 
   const setup = (p5: any, canvasParentRef: any) => {
     p5.createCanvas(dim * MAX_X, dim * MAX_Y).parent(canvasParentRef);
@@ -33,15 +45,31 @@ export const RightPanel: React.FC<any> = ({ stateManager }) => {
         if (landmarkState[x + y * MAX_X] === 1) {
           p5.fill(0, 0, 0);
         } else if (landmarkState[x + y * MAX_X] === 2) {
-          p5.fill(102, 102, 255);
-        } else if (p5.mouseX > x * dim && p5.mouseX < (x + 1) * dim && p5.mouseY > y * dim && p5.mouseY < (y + 1) * dim) {
-          setCurrentCoordinate([x, y]);
-          p5.fill(225, 225, 225);
+          p5.fill(255, 64, 64);
         } else {
           p5.fill(255, 255, 255);
         }
 
+        if (p5.mouseX > x * dim && p5.mouseX < (x + 1) * dim && p5.mouseY > y * dim && p5.mouseY < (y + 1) * dim) {
+          setCurrentCoordinate([x, y]);
+          p5.fill(225, 225, 225);
+        }
+
         p5.rect(x * dim, y * dim, dim, dim);
+
+        if (bestRoute && bestRoute.route.length >= 4) {
+          const { route } = bestRoute;
+
+          for (let i = 0; i < -2 + bestRoute.route.length; i += 2) {
+            try {
+              p5.stroke(0, 255, 0);
+              p5.strokeWeight(3);
+              p5.line(dim / 2 + dim * route[i + 1], dim / 2 + dim * route[i + 0], dim / 2 + dim * route[i + 3], dim / 2 + dim * route[i + 2]);
+            } catch (e) {
+              console.log(e);
+            }
+          }
+        }
       }
     }
   };
@@ -54,17 +82,21 @@ export const RightPanel: React.FC<any> = ({ stateManager }) => {
 
     if (tab === 1 && x >= 0 && y >= 0 && !loading) {
       setLoading(true);
+      setLoadingMessage('Validating landmark...');
       const landmark = await getLandmark(x, y);
-      if (landmark.data.type !== null) {
+
+      setLoadingMessage('Allocating landmark...');
+      if (landmark.data.type === 'wall') {
         await putLandmark(x, y, null);
         landmarkState[x + y * MAX_X] = 0;
-      } else {
+      } else if (landmark.data.type === null) {
         await putLandmark(x, y, 'wall');
         landmarkState[x + y * MAX_X] = 1;
       }
       setLandmarkState([...landmarkState]);
     }
 
+    setLoadingMessage(null);
     setLoading(false);
   };
 
@@ -72,7 +104,11 @@ export const RightPanel: React.FC<any> = ({ stateManager }) => {
     <>
       <Sketch setup={setup} draw={draw} mouseClicked={mouseClicked} />
       <ShowIf cond={loading}>
-        <CircularProgress style={{ bottom: 15, left: '35vw', position: 'absolute' }} size={20} />
+        <div style={{ bottom: 10, left: '35vw', position: 'absolute' }}>
+          <Typography style={{ fontSize: 18 }}>
+            <CircularProgress size={18} /> {loadingMessage}
+          </Typography>
+        </div>
       </ShowIf>
       <Typography style={{ bottom: 10, left: '25vw', position: 'absolute', fontSize: 18 }}>
         Coordinate ({currentCoordinate[0]},{currentCoordinate[1]})

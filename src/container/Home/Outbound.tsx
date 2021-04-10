@@ -6,7 +6,7 @@ import React from 'react';
 import { Grid, TextField, Button, Typography } from '@material-ui/core';
 
 export const Outbound: React.FC<any> = ({ stateManager }) => {
-  const { itemsToFind, setItemsToFind } = stateManager;
+  const { itemsToFind, setItemsToFind, loading } = stateManager;
 
   return (
     <>
@@ -57,7 +57,7 @@ export const Outbound: React.FC<any> = ({ stateManager }) => {
           </Grid>
         </Grid>
         <Grid item>
-          <Button variant="contained" color="primary" style={{ width: '100%', marginTop: 10 }}>
+          <Button variant="contained" color="primary" style={{ width: '100%', marginTop: 10 }} disabled={loading}>
             Find best route
           </Button>
         </Grid>
