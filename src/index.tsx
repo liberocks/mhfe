@@ -3,7 +3,6 @@ import React from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core/styles';
 import ReactDOM from 'react-dom';
-import 'react-dotenv';
 
 import App from './App';
 import reportWebVitals from './reportWebVitals';
